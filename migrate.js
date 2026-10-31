@@ -1,0 +1,10 @@
+import dotenv from "dotenv";
+import fs from "fs/promises";
+import pg from "pg";
+dotenv.config();
+if(!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
+const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.NODE_ENV==="production"?{rejectUnauthorized:false}:false});
+const sql=await fs.readFile("database-schema.sql","utf8");
+await pool.query(sql);
+console.log("ZENVORA PostgreSQL schema is ready.");
+await pool.end();
